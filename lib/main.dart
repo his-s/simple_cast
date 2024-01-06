@@ -9,30 +9,10 @@ import 'uitls/run_python_script.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Must add this line.
   await windowManager.ensureInitialized();
-
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(500, 0),
-    alwaysOnTop: true,
-    minimumSize: Size(100, 2),
-    backgroundColor: Colors.transparent,
-    skipTaskbar: true,
-    titleBarStyle: TitleBarStyle.hidden,
+  runApp(
+    const MainApp(),
   );
-
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.setAlignment(Alignment.topCenter, animate: true);
-    final postion = await windowManager.getPosition();
-    await windowManager.setAsFrameless();
-    await windowManager.setHasShadow(false);
-    await windowManager.setPosition(Offset(postion.dx, -33));
-    // await windowManager.show();
-    // await windowManager.focus();
-    await windowManager.setOpacity(1);
-  });
-
-  runApp(const MainApp());
 }
 
 class MainApp extends StatefulWidget {
@@ -43,6 +23,38 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  Future<void> configureWindow() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
+
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(500, 0),
+      alwaysOnTop: true,
+      minimumSize: Size(100, 2),
+      backgroundColor: Colors.transparent,
+      skipTaskbar: true,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.setAlignment(Alignment.topCenter, animate: true);
+      final postion = await windowManager.getPosition();
+      await windowManager.setAsFrameless();
+      await windowManager.setHasShadow(false);
+      await windowManager.setPosition(Offset(
+        postion.dx,
+        -33,
+      ));
+      await windowManager.setOpacity(1);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    configureWindow();
+  }
+
   bool isFullScreen = false;
   bool show = false;
   final TextEditingController _controller = TextEditingController();
@@ -76,11 +88,22 @@ class _MainAppState extends State<MainApp> {
                   physics: const NeverScrollableScrollPhysics(),
                   child: Column(
                     children: [
-                      const SizedBox(
-                        height: 18,
+                      SizedBox(
+                        height: 35,
+                        width: 25,
+                        child: IconButton(
+                          onPressed: () async {
+                            await configureWindow();
+                          },
+                          icon: const Icon(
+                            Icons.adjust_rounded,
+                          ),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                        ),
                         child: Row(
                           children: [
                             SizedBox(
